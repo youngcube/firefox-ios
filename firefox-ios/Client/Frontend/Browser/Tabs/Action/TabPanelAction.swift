@@ -85,8 +85,10 @@ class KeyboardContext: ActionContext {
 
 class RefreshTabContext: ActionContext {
     let tabDisplayModel: TabDisplayModel
-    init(tabDisplayModel: TabDisplayModel, windowUUID: WindowUUID) {
+    let refreshed: Bool
+    init(tabDisplayModel: TabDisplayModel, refreshed: Bool, windowUUID: WindowUUID) {
         self.tabDisplayModel = tabDisplayModel
+        self.refreshed = refreshed
         super.init(windowUUID: windowUUID)
     }
 }

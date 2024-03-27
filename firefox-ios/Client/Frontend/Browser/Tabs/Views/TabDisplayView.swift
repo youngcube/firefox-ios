@@ -34,6 +34,21 @@ class TabDisplayView: UIView,
 
         return tabsState.inactiveTabs.isEmpty
     }
+    
+//    @discardableResult
+//    private func cancelDragAndGestures() -> Bool {
+//        let isActive = collectionView.hasActiveDrag || isLongPressGestureStarted
+//        collectionView.cancelInteractiveMovement()
+//        collectionView.endInteractiveMovement()
+//
+//        // Long-pressing a cell to initiate dragging, but not actually moving the cell,
+//        // will not trigger the collectionView's internal 'interactive movement'
+//        // vars/funcs, and cancelInteractiveMovement() will not work. The gesture
+//        // recognizer needs to be cancelled in this case.
+//        collectionView.gestureRecognizers?.forEach { $0.cancel() }
+//
+//        return isActive
+//    }
 
     // Dragging on the collection view is either an 'active drag' where the item is moved, or
     // that the item has been long pressed on (and not moved yet), and this gesture recognizer
@@ -96,19 +111,25 @@ class TabDisplayView: UIView,
     func newState(state: TabsPanelState) {
         tabsState = state
 
-        updateCollectionViewLayout()
-
+        
+        collectionView.reloadData()
+        
+        if state.refreshed {
+            
+          //  cancelDragAndGestures()
+        }
+        
         if let index = state.scrollToIndex {
             scrollToTab(index)
         }
     }
 
-    private func updateCollectionViewLayout() {
-        collectionView.reloadData()
-        collectionView.collectionViewLayout.invalidateLayout()
-        collectionView.setNeedsLayout()
-        collectionView.layoutIfNeeded()
-    }
+//    private func updateCollectionViewLayout() {
+//        //collectionView.reloadData()
+//        collectionView.collectionViewLayout.invalidateLayout()
+//        collectionView.setNeedsLayout()
+//        collectionView.layoutIfNeeded()
+//    }
 
     private func scrollToTab(_ index: Int) {
         let section = shouldHideInactiveTabs ? 0 : 1
@@ -352,16 +373,19 @@ extension TabDisplayView: UICollectionViewDragDelegate, UICollectionViewDropDele
               let dragItem = coordinator.items.first?.dragItem,
               let tab = dragItem.localObject as? TabModel,
               let sourceIndex = tabsState.tabs.firstIndex(of: tab) else { return }
-
+        
         let section = destinationIndexPath.section
         let start = IndexPath(row: sourceIndex, section: section)
         let end = IndexPath(row: destinationIndexPath.item, section: section)
-        store.dispatch(TabPanelAction.moveTab(MoveTabContext(originIndex: start.row,
-                                                             destinationIndex: end.row,
-                                                             isPrivate: tabsState.isPrivateMode,
-                                                             windowUUID: windowUUID)))
         coordinator.drop(dragItem, toItemAt: destinationIndexPath)
-
-        collectionView.moveItem(at: start, to: end)
+        
+        collectionView.performBatchUpdates({
+            store.dispatch(TabPanelAction.moveTab(MoveTabContext(originIndex: start.row,
+                                                                 destinationIndex: end.row,
+                                                                 isPrivate: tabsState.isPrivateMode,
+                                                                 windowUUID: windowUUID)))
+            collectionView.moveItem(at: start, to: end)
+        })
+        
     }
 }

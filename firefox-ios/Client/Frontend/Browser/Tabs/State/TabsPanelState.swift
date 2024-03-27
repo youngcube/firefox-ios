@@ -13,6 +13,7 @@ struct TabsPanelState: ScreenState, Equatable {
     var toastType: ToastType?
     var windowUUID: WindowUUID
     var scrollToIndex: Int?
+    var refreshed: Bool
 
     var isPrivateTabsEmpty: Bool {
         guard isPrivateMode else { return false }
@@ -33,7 +34,8 @@ struct TabsPanelState: ScreenState, Equatable {
                   inactiveTabs: panelState.inactiveTabs,
                   isInactiveTabsExpanded: panelState.isInactiveTabsExpanded,
                   toastType: panelState.toastType,
-                  scrollToIndex: panelState.scrollToIndex)
+                  scrollToIndex: panelState.scrollToIndex, 
+                  refreshed: panelState.refreshed)
     }
 
     init(windowUUID: WindowUUID, isPrivateMode: Bool = false) {
@@ -43,7 +45,8 @@ struct TabsPanelState: ScreenState, Equatable {
             tabs: [TabModel](),
             inactiveTabs: [InactiveTabsModel](),
             isInactiveTabsExpanded: false,
-            toastType: nil)
+            toastType: nil, 
+            refreshed: false)
     }
 
     init(windowUUID: WindowUUID,
@@ -52,7 +55,8 @@ struct TabsPanelState: ScreenState, Equatable {
          inactiveTabs: [InactiveTabsModel],
          isInactiveTabsExpanded: Bool,
          toastType: ToastType? = nil,
-         scrollToIndex: Int? = nil) {
+         scrollToIndex: Int? = nil,
+         refreshed: Bool = false) {
         self.isPrivateMode = isPrivateMode
         self.tabs = tabs
         self.inactiveTabs = inactiveTabs
@@ -60,6 +64,7 @@ struct TabsPanelState: ScreenState, Equatable {
         self.toastType = toastType
         self.windowUUID = windowUUID
         self.scrollToIndex = scrollToIndex
+        self.refreshed = refreshed
     }
 
     static let reducer: Reducer<Self> = { state, action in
@@ -78,6 +83,7 @@ struct TabsPanelState: ScreenState, Equatable {
                                   scrollToIndex: selectedTabIndex)
         case TabPanelAction.refreshTab(let context):
             let tabModel = context.tabDisplayModel
+            let refreshed = context.refreshed
             var selectedTabIndex: Int?
             if tabModel.shouldScrollToTab {
                 selectedTabIndex = tabModel.tabs.firstIndex(where: { $0.isSelected })
@@ -87,7 +93,8 @@ struct TabsPanelState: ScreenState, Equatable {
                                   tabs: tabModel.tabs,
                                   inactiveTabs: state.inactiveTabs,
                                   isInactiveTabsExpanded: state.isInactiveTabsExpanded,
-                                  scrollToIndex: selectedTabIndex)
+                                  scrollToIndex: selectedTabIndex,
+                                  refreshed: refreshed)
         case TabPanelAction.toggleInactiveTabs:
             return TabsPanelState(windowUUID: state.windowUUID,
                                   isPrivateMode: state.isPrivateMode,
