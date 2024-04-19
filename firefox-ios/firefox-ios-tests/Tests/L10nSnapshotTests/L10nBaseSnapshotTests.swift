@@ -7,7 +7,7 @@ import XCTest
 
 let testPageBase = "http://www.example.com"
 let loremIpsumURL = "\(testPageBase)"
-let TIMEOUT: TimeInterval = 15
+let TIMEOUT: TimeInterval = 30
 class L10nBaseSnapshotTests: XCTestCase {
     var app: XCUIApplication!
     var navigator: MMNavigator<FxUserState>!
