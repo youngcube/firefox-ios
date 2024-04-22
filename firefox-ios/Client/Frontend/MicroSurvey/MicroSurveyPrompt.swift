@@ -41,7 +41,7 @@ class MicroSurveyPromptView: UIView, ThemeApplicable {
     }
 
     private lazy var closeButton: UIButton = .build { button in
-        // TODO: FXIOS-8987 - Add accessibility labels
+        // TODO: FXIOS-9028 - Add accessibility labels
         button.accessibilityIdentifier = AccessibilityIdentifiers.MicroSurvey.Prompt.closeButton
         button.setImage(UIImage(named: StandardImageIdentifiers.ExtraLarge.crossCircleFill), for: .normal)
         button.addTarget(self, action: #selector(self.closeMicroSurvey), for: .touchUpInside)
